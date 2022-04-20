@@ -1,0 +1,36 @@
+<launch>
+<param name="robot_description" command="$(find xacro)/xacro $(find turtlebot_description)/robots/kobuki_hexagons_asus_xtion_pro.urdf.xacro" />
+
+<!-- BEGIN ROBOT 1-->
+    <group ns="robot1">
+        <param name="tf_prefix" value="robot1_tf" />
+        <node pkg="tf" type="static_transform_publisher" name="robot1_broadcaster" args="1 0 0 3 0 0 map robot1_tf/odom 100"/>
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 1 -y 0 -z 0 -R 0 -P 0 -Y 3" />
+                <arg name="robot_name" value="robot1_tf" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 2-->
+    <group ns="robot2">
+        <node pkg="tf" type="static_transform_publisher" name="robot2_broadcaster" args="1 -1 0 3 0 0 map robot2_tf/odom 100"/>
+        <param name="tf_prefix" value="robot2_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 1 -y -1 -z 0 -R 0 -P 0 -Y 3" />
+                <arg name="robot_name" value="robot2_tf" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 3-->
+    <group ns="robot3">
+        <node pkg="tf" type="static_transform_publisher" name="robot3_broadcaster" args="1 1 0 3 0 0 map robot3_tf/odom 100"/>
+        <param name="tf_prefix" value="robot3_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 1 -y 1 -z 0 -R 0 -P 0 -Y 3" />
+                <arg name="robot_name" value="robot3_tf" />
+            </include>
+    </group>
+
+
+
+</launch>
