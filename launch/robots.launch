@@ -4,33 +4,111 @@
 <!-- BEGIN ROBOT 1-->
     <group ns="robot1">
         <param name="tf_prefix" value="robot1_tf" />
-        <node pkg="tf" type="static_transform_publisher" name="robot1_broadcaster" args="1 0 0 3 0 0 map robot1_tf/odom 100"/>
+        <node pkg="tf" type="static_transform_publisher" name="robot1_broadcaster" args="1 0 0 0 0 0 map robot1_tf/odom 100"/>
             <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
-                <arg name="init_pose" value="-x 1 -y 0 -z 0 -R 0 -P 0 -Y 3" />
+                <arg name="init_pose" value="-x 1 -y 0 -z 0 -R 0 -P 0 -Y 0" />
                 <arg name="robot_name" value="robot1_tf" />
+                <arg name="robot_number" value="1" />
             </include>
     </group>
 
 <!-- BEGIN ROBOT 2-->
     <group ns="robot2">
-        <node pkg="tf" type="static_transform_publisher" name="robot2_broadcaster" args="1 -1 0 3 0 0 map robot2_tf/odom 100"/>
+        <node pkg="tf" type="static_transform_publisher" name="robot2_broadcaster" args="2 0 0 0 0 0 map robot2_tf/odom 100"/>
         <param name="tf_prefix" value="robot2_tf" />
             <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
-                <arg name="init_pose" value="-x 1 -y -1 -z 0 -R 0 -P 0 -Y 3" />
+                <arg name="init_pose" value="-x 2 -y 0 -z 0 -R 0 -P 0 -Y 0" />
                 <arg name="robot_name" value="robot2_tf" />
+                <arg name="robot_number" value="2" />
             </include>
     </group>
 
 <!-- BEGIN ROBOT 3-->
     <group ns="robot3">
-        <node pkg="tf" type="static_transform_publisher" name="robot3_broadcaster" args="1 1 0 3 0 0 map robot3_tf/odom 100"/>
+        <node pkg="tf" type="static_transform_publisher" name="robot3_broadcaster" args="3 0 0 0 0 0 map robot3_tf/odom 100"/>
         <param name="tf_prefix" value="robot3_tf" />
             <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
-                <arg name="init_pose" value="-x 1 -y 1 -z 0 -R 0 -P 0 -Y 3" />
+                <arg name="init_pose" value="-x 3 -y 0 -z 0 -R 0 -P 0 -Y 0" />
                 <arg name="robot_name" value="robot3_tf" />
+                <arg name="robot_number" value="3" />
             </include>
     </group>
 
+<!-- BEGIN ROBOT 4-->
+    <group ns="robot4">
+        <node pkg="tf" type="static_transform_publisher" name="robot4_broadcaster" args="4 0 0 0 0 0 map robot4_tf/odom 100"/>
+        <param name="tf_prefix" value="robot4_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 4 -y 0 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot4_tf" />
+                <arg name="robot_number" value="4" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 5-->
+    <group ns="robot5">
+        <node pkg="tf" type="static_transform_publisher" name="robot5_broadcaster" args="5 0 0 0 0 0 map robot5_tf/odom 100"/>
+        <param name="tf_prefix" value="robot5_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 5 -y 0 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot5_tf" />
+                <arg name="robot_number" value="5" />
+            </include>
+    </group>
+<!-- BEGIN ROBOT 6-->
+    <group ns="robot6">
+        <param name="tf_prefix" value="robot6_tf" />
+        <node pkg="tf" type="static_transform_publisher" name="robot6_broadcaster" args="0 1 0 0 0 0 map robot6_tf/odom 100"/>
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 0 -y 1 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot6_tf" />
+                <arg name="robot_number" value="6" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 7-->
+    <group ns="robot7">
+        <node pkg="tf" type="static_transform_publisher" name="robot2_broadcaster" args="0 2 0 0 0 0 map robot7_tf/odom 100"/>
+        <param name="tf_prefix" value="robot7_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 0 -y 2 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot7_tf" />
+                <arg name="robot_number" value="7" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 8-->
+    <group ns="robot8">
+        <node pkg="tf" type="static_transform_publisher" name="robot8_broadcaster" args="0 3 0 0 0 0 map robot8_tf/odom 100"/>
+        <param name="tf_prefix" value="robot8_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 0 -y 3 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot8_tf" />
+                <arg name="robot_number" value="8" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 9-->
+    <group ns="robot9">
+        <node pkg="tf" type="static_transform_publisher" name="robot9_broadcaster" args="0 4 0 0 0 0 map robot9_tf/odom 100"/>
+        <param name="tf_prefix" value="robot9_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 0 -y 4 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot9_tf" />
+                <arg name="robot_number" value="9" />
+            </include>
+    </group>
+
+<!-- BEGIN ROBOT 10-->
+    <group ns="robot10">
+        <node pkg="tf" type="static_transform_publisher" name="robot10_broadcaster" args="0 5 0 0 0 0 map robot10_tf/odom 100"/>
+        <param name="tf_prefix" value="robot10_tf" />
+            <include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/one_robot.launch" >
+                <arg name="init_pose" value="-x 0 -y 5 -z 0 -R 0 -P 0 -Y 0" />
+                <arg name="robot_name" value="robot10_tf" />
+                <arg name="robot_number" value="10" />
+            </include>
+    </group>
 
 
 </launch>

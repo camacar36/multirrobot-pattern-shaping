@@ -1,7 +1,15 @@
 from module import *
 from features import *
 
+from geometry_msgs.msg import Polygon, Point32
+import rospy
+
 import pygame, sys
+
+# Initializing ros node
+rospy.init_node("interface_node")
+
+sol_pub = rospy.Publisher('/goal_points', Polygon, queue_size=5)
 
 # Initializing pygame
 pygame.init()
@@ -63,10 +71,16 @@ def print_path():
         print(i.x, i.y)
 
 def send_sol():
-    print("enviando solución")
 
+    poly = Polygon()
+    for s in sol:
+        poly.points.append(Point32(s.x/10,s.y/10,0))
+        
+   
+    sol_pub.publish(poly)
 # Initializing the solution grid
 fill_super_grid()
+
 
 # Infinite loop where the screen updates
 while True:

@@ -1,6 +1,7 @@
 <launch>
     <arg name="robot_name"/>
     <arg name="init_pose"/>
+    <arg name="robot_number"/>
 
     <node name="spawn_minibot_model" pkg="gazebo_ros" type="spawn_model" args="$(arg init_pose) -urdf -param /robot_description -model $(arg robot_name)" respawn="false" output="screen" />
 
@@ -13,6 +14,8 @@
         <remap from="image" to="camera/depth/image_raw"/>
         <remap from="scan" to="scan"/>
     </node>
+
+    <node pkg="turtlebot_gazebo" name="move_tb" type="move_tb.py" args="-robot $(arg robot_number) $(arg init_pose)" output="screen" />
 
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" >
