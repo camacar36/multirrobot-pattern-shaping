@@ -1,5 +1,9 @@
-from curses import color_content
 import pygame
+
+class Point: 
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 class Button:
     def __init__(self,text,width,height,pos,elevation,font, color_on, color_off):
@@ -50,4 +54,3 @@ class Button:
         else:
             self.dynamic_elecation = self.elevation
             self.top_color = self.color_off
-
