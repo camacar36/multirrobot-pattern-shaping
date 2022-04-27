@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import time
+import rospy
 
 class Node():
     cont = 0
@@ -73,14 +74,6 @@ class Priority_Queue():
     def push(self, node, _key):
         self.queue.append(node)
         self.queue = sorted(self.queue, key=_key)
-        
-        # if len(self.queue) > 0:
-        #     for i in range(len(self.queue)):
-        #         if node.pessimistic < self.queue[i].pessimistic:
-        #             self.queue.insert(i,node)
-        # else:
-        #     self.queue.append(node)
-
 
     def pop(self):
         return self.queue.pop()
@@ -92,3 +85,23 @@ class Point():
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
+def compute_matrix(points, robots):
+    m = np.zeros((len(points), len(robots)))
+    path = [True]
+    for i in range(1,len(points)):
+        path.append(False)
+        for j in range(1,len(robots)):
+            px = points[i].x
+            py = points[i].y
+
+            rx = robots[j].x
+            ry = robots[j].y
+
+            m[i, j] = math.sqrt(pow(px-rx, 2) + pow(py - ry, 2))
+
+    return path, m
+
+
+

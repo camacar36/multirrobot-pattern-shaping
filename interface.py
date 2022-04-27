@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from module import *
 from features import *
 
@@ -112,8 +113,11 @@ while True:
     # Drawing the grid
     for i in range(GRID_L,GRID_W,CELL_W):
         for j in range(GRID_T,GRID_H,CELL_H):
+            # Drawing the main grid
             grid = pygame.Rect(i,j,CELL_W,CELL_H)
             pygame.draw.rect(screen,lightgrey, grid,CELL_BORDER_WIDTH)
+
+            # Getting the mouse events in order to draw or delete the path - this path is saved at super_grid
             izq = pygame.mouse.get_pressed()[0]
             dch = pygame.mouse.get_pressed()[2] 
             if izq or dch:

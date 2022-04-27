@@ -1,11 +1,13 @@
-import approach
+from geometry_msgs.msg import Polygon, Point32
+from approach import *
 import rospy
-from bb_utils import Node, Priority_Queue, Point
+from bb_utils import *
 import math
 import numpy as np
 import time
 import tf2_ros
 
+points = Polygon().points
 
 def is_feasible(b):
     return b
@@ -72,7 +74,7 @@ def bb_algorithm(n0):
         
 
 
-def main():
+# def main():
     # leer los datos del problema (robots y puntos)
     # points = [Point(0,0), Point(1,1), Point(2,2), Point(3,3), Point(4,4), Point(5,5)]
     # robots = [Point(0,0), Point(0, 0), Point(1, 2), Point(5,3), Point(1, 1), Point(3, 3)]    
@@ -94,23 +96,58 @@ def main():
     #     points.append(Point(np.random.randint(100), np.random.randint(100)))
     #     robots.append(Point(np.random.randint(100), np.random.randint(100)))
 
+def get_points(msg):
+    global points
+    points.append(Point32(0,0,0))
+    for m in msg.points:
+        points.append(m)
+
+def get_robots():
+    robots = [Point(0,0)]
+
+    tfBuffer = tf2_ros.Buffer()
+    listener = tf2_ros.TransformListener(tfBuffer)
+
+    rate = rospy.Rate(10.0)
+
+    for i in range(1, len(points)+1):
+        trans = None
+        while trans == None:
+            try:
+
+                trans = tfBuffer.lookup_transform('map','robot' + str(i) + '_tf/odom', rospy.Time())
+                robots.append(Point(trans.transform.translation.x, trans.transform.translation.y))
+            
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                
+                rate.sleep()
+                continue
+
     
+    return robots
+    
+rospy.init_node("bb_algorithm")
 
-    path, m = approach.compute_matrix(approach.get_points(), approach.get_robots())
-    n0 = Node(m, 0, 0, m[0,0], path, [])
+sub_points = rospy.Subscriber('/goal_points', Polygon, get_points)
 
-    print("holahola")
-    print(m)
+while not rospy.is_shutdown():
 
-    # llamar al algoritmo
-    start = time.time()
-    bb_algorithm(n0)
-    stop = time.time()
-    print(stop-start)
-    print(Node.best_v, Node.best_sol, Node.cont)
+    if len(points) > 0:
+        path, m = compute_matrix(points, get_robots())
+        n0 = Node(m, 0, 0, m[0,0], path, [])
+
+        # llamar al algoritmo
+        start = time.time()
+        bb_algorithm(n0)
+        stop = time.time()
+        print(stop-start)
+        print("sol: %r", Node.best_sol)
+
+        points = Polygon().points
+
+        break
 
 
 
 
-main()
 

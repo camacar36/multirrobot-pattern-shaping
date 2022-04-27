@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 WINDOW_SIZE = WINDOW_WIDTH, WINDOW_HEIGHT   = [650,600]
 GRID_SIZE   = GRID_WIDTH,  GRID_HEIGHT      = [600,400]
 
