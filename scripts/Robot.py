@@ -27,7 +27,7 @@ class Robot:
         self.vel_topic = rospy.Publisher(topic_vel, Twist, queue_size=1)
 
         # Setting rate
-        #self.rate = rospy.Rate(5)
+        #self.rate = rospy.Rate(5) 
         self.rate = rospy.Rate(1)
     
     # Callback to get odometry information
