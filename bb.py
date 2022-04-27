@@ -7,16 +7,19 @@ import numpy as np
 import time
 import tf2_ros
 
-points = Polygon().points
+points  = []
+start   = ""
+stop    = ""
 
 def is_feasible(b):
     return b
 
 def is_leaf(node):    
-    if node.p == len(node.map) - 1:
+    if node.p == len(Node.m) - 1:
         if node.current_weight <= Node.best_v:
             Node.best_v = node.current_weight
             Node.best_sol = np.copy(node.sol)
+            # print("best:", Node.best_sol, node.sol)
         return True
     else:
         return False
@@ -24,13 +27,16 @@ def is_leaf(node):
 
 
 def bb_algorithm(n0):
+    global start, stop
+
+    start = time.time()
 
     pq = Priority_Queue()
     pq.push(n0, lambda n0 : n0.pessimistic)
     podados = 0
     explorados = 1
 
-
+    
     while not pq.isEmpty():
         # se obtiene el
         # mejor elemento de la cola y se elimina
@@ -39,39 +45,38 @@ def bb_algorithm(n0):
         if is_leaf(node):  
             continue   
             
-
         # para cada robot
-        for i in range(1, len(node.map)):
+        for i in range(1, len(Node.m)):
             aux_path = np.copy(node.path)
 
             if not is_feasible(aux_path[i]) :
                 aux_path[i] = True
                 aux_sol = np.append(node.sol, i)
-                n = Node(   node.map, 
-                            node.p + 1, 
+                n = Node(   node.p + 1, 
                             i, 
-                            node.current_weight + node.map[node.p + 1, i],
+                            node.current_weight + Node.m[node.p + 1, i],
                             aux_path, 
                             aux_sol
                         )
-                
-
+                #print("-",node.sol, n.sol)
                 if n.pessimistic < Node.best_v:
                     Node.best_v = n.pessimistic
 
-                
-
-                if n.optimistic > Node.best_v or n.current_weight > Node.best_v :
+                if n.optimistic > Node.best_v or n.current_weight > Node.best_v or n.optimistic > n.pessimistic:
                     podados = podados + 1
                     continue 
                 explorados = explorados + 1
-                pq.push(n, lambda n: n.pessimistic)
+                pq.push(n, lambda n: n.pessimistic - n.optimistic)
 
         # for n in pq.queue:
         #     print(n.r, n.sol, n.path)
         # print("---")
     print(explorados, podados)
-        
+
+    stop = time.time()
+    print(stop-start)
+
+    print("sol: ", Node.best_sol, Node.best_v)
 
 
 # def main():
@@ -98,9 +103,9 @@ def bb_algorithm(n0):
 
 def get_points(msg):
     global points
-    points.append(Point32(0,0,0))
+    points.append(Point(0,0))
     for m in msg.points:
-        points.append(m)
+        points.append(Point(round(m.x, 2), round(m.y, 2)))
 
 def get_robots():
     robots = [Point(0,0)]
@@ -110,7 +115,7 @@ def get_robots():
 
     rate = rospy.Rate(10.0)
 
-    for i in range(1, len(points)+1):
+    for i in range(1, len(points)):
         trans = None
         while trans == None:
             try:
@@ -122,30 +127,34 @@ def get_robots():
                 
                 rate.sleep()
                 continue
-
     
     return robots
     
 rospy.init_node("bb_algorithm")
 
-sub_points = rospy.Subscriber('/goal_points', Polygon, get_points)
+# sub_points = rospy.Subscriber('/goal_points', Polygon, get_points)
 
-while not rospy.is_shutdown():
+# while True:
 
-    if len(points) > 0:
-        path, m = compute_matrix(points, get_robots())
-        n0 = Node(m, 0, 0, m[0,0], path, [])
+#     if len(points) > 0:
+points = [Point(0,0), Point(1,0.6), Point(1.4,0.6), Point(1.8,0.6), Point(2.4,0.6), Point(2.8,0.6), Point(3.2,0.6), Point(3.8,0.6), Point(4.2,0.6)]#, Point(4.6,0.6)]#, Point(5,0.6)]       
+robots = get_robots()
+# robots = [Point(0,0), Point(1, 0), Point(2, 0), Point(3,0), Point(4, 0), Point(5, 0), Point(0,1), Point(0,2), Point(0,3)]#, Point(0,4)]#, Point(0,5)]    
 
-        # llamar al algoritmo
-        start = time.time()
-        bb_algorithm(n0)
-        stop = time.time()
-        print(stop-start)
-        print("sol: %r", Node.best_sol)
+for i in range(len(points)):
+    print(robots[i].x, robots[i].y, points[i].x, points[i].y)
+path, Node.m, Node.m_opt = compute_matrix(points, robots)
+print(Node.m_opt)
+n0 = Node(0, 0, Node.m[0,0], path, [])
 
-        points = Polygon().points
 
-        break
+# llamar al algoritmor al algoritmo
+bb_algorithm(n0)
+
+# #points = Polygon().points
+# points = []
+
+# break
 
 
 

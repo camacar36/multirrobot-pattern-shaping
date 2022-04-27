@@ -7,9 +7,11 @@ class Node():
     cont = 0
     best_v = math.inf
     best_sol = []
+    m = []
+    m_opt = []
 
-    def __init__(self, map, p, r, current_weight, path, sol):
-        self.map = map
+    def __init__(self, p, r, current_weight, path, sol):
+        # self.map = map
         self.p = p
         self.r = r 
         self.current_weight = current_weight
@@ -17,26 +19,29 @@ class Node():
         
         start = time.time()
         self.pessimistic = self.current_weight + self.greedy()
-        self.optimistic = self.current_weight + self.opt_greedy()
+        self.optimistic = self.current_weight + Node.m_opt[self.p]  #self.opt_greedy()
         end = time.time()
         Node.cont = Node.cont + end - start
         self.sol = sol
+        # print(len(Node.m_opt))
+
+
 
     def greedy(self):
 
         aux_path = np.copy(self.path)
         greedy = 0
 
-        for i in range(self.p + 1, len(self.map)):
+        for i in range(self.p + 1, len(Node.m)):
 
             best_val = math.inf
             pos_best = 0
-            for j in range(1, len(self.map[i])):               
+            for j in range(1, len(Node.m[i])):               
 
                 if not aux_path[j]:
-                    if self.map[i, j] < best_val:
+                    if Node.m[i, j] < best_val:
 
-                        best_val = self.map[i, j]
+                        best_val = Node.m[i, j]
                         pos_best = j
                         
             aux_path[pos_best] = True
@@ -44,22 +49,42 @@ class Node():
 
         return greedy
 
+    def greedy2(self):
+
+        aux_path = np.copy(self.path)
+        greedy = 0
+        for i in range(self.p + 1, len(Node.m)):
+
+            pos_best = 1
+            for j in range(1, len(Node.m[i])):               
+
+                if not aux_path[j]:
+                    pos_best = j
+                    break
+                        
+            aux_path[pos_best] = True
+            greedy = greedy + Node.m[i][pos_best]
+
+        return greedy
+
     def opt_greedy(self):
 
         greedy = 0
 
-        for i in range(self.p + 1, len(self.map)):
+        for i in range(self.p + 1, len(Node.m)):
 
             best_val = math.inf
-            for j in range(1, len(self.map[i])):               
+            for j in range(1, len(Node.m[i])):               
 
-                if self.map[i, j] < best_val:
+                if Node.m[i, j] < best_val:
 
-                    best_val = self.map[i, j]
+                    best_val = Node.m[i, j]
                         
             greedy = greedy + best_val
 
         return greedy
+
+    
 
 
 
@@ -83,15 +108,18 @@ class Priority_Queue():
 
 class Point():
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.x = float(x)
+        self.y = float(y)
 
 
 def compute_matrix(points, robots):
     m = np.zeros((len(points), len(robots)))
     path = [True]
+    aux_opt = [0]
+    m_opt = []
     for i in range(1,len(points)):
         path.append(False)
+        best_val = math.inf
         for j in range(1,len(robots)):
             px = points[i].x
             py = points[i].y
@@ -101,7 +129,20 @@ def compute_matrix(points, robots):
 
             m[i, j] = math.sqrt(pow(px-rx, 2) + pow(py - ry, 2))
 
-    return path, m
+            if m[i, j] < best_val:
+
+                best_val = m[i, j]
+
+        aux_opt.append(best_val)
+
+    
+    for i in range(len(aux_opt)):
+        opt = 0
+        for k in range(i+1, len(aux_opt)):
+            opt = opt + aux_opt[k]
+        m_opt.append(opt)
+
+    return path, m, m_opt
 
 
 
