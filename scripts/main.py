@@ -35,7 +35,7 @@ def main():
     # --- Movement of the robot ---
 
     actual_distance = robot1.get_distance_to_objective(point)
-    prev_distance = actual_pos
+    prev_distance = actual_distance
 
     # While distance to the final point is more than 0.1
     while actual_distance > 0.1:
@@ -47,11 +47,11 @@ def main():
 
         # If the previous distance is lower than actual distance, it means that the robot have passed near the point
         # but not so close enough to stop (>0.1), so it reorientates robot and keeps moving
-        if prev_pos < actual_pos:
+        if prev_distance < actual_distance:
             robot1.stop()
             robot1.face_to_point(point,0.1)
 
-        prev_distance = actual_pos
+        prev_distance = actual_distance
 
     robot1.stop()
 
