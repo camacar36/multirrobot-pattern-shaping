@@ -6,7 +6,6 @@ import sys
 import tf
 import math
 
-
 def main():
 
     if len(sys.argv) != 2:
@@ -45,23 +44,21 @@ def main():
         actual_distance = robot1.get_distance_to_objective(point)
         robot1.move_forward(0.4)
 
-        img = robot1.read_image()
-        robot1.read_depth_image()
-        detected, side = robot1.analyze_img(img)
+        detected, side = robot1.detect_obstacles()
         if detected:
-                if side == 1: # Turn left
-                    start_angle = robot1.get_actual_orientation()
-                    actual_angle = start_angle
-                    while actual_angle < math.pi/6
-                        actual_angle = abs(robot1.get_actual_orientation() - start_angle)
-                        robot1.turn_left(0.2)
-                
-                elif side == -1: # Turn right
-                    start_angle = robot1.get_actual_orientation()
-                    actual_angle = start_angle
-                    while actual_angle < math.pi/6
-                        actual_angle = abs(robot1.get_actual_orientation() - start_angle)
-                        robot1.turn_right(0.2)
+            if side == 1: # Turn left
+                start_angle = robot1.get_actual_orientation()
+                actual_angle = start_angle
+                while actual_angle < math.pi/6
+                    actual_angle = abs(robot1.get_actual_orientation() - start_angle)
+                    robot1.turn_left(0.2)
+            
+            elif side == -1: # Turn right
+                start_angle = robot1.get_actual_orientation()
+                actual_angle = start_angle
+                while actual_angle < math.pi/6
+                    actual_angle = abs(robot1.get_actual_orientation() - start_angle)
+                    robot1.turn_right(0.2)
 
         # If the previous distance is lower than actual distance, it means that the robot have passed near the point
         # but not so close enough to stop (>0.1), so it reorientates robot and keeps moving
