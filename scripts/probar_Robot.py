@@ -3,6 +3,7 @@
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import LaserScan
 from cv_bridge import CvBridge
 
 import numpy as np
@@ -23,6 +24,9 @@ class Robot:
         vel_topic = '/robot' + robot_number + '/mobile_base/commands/velocity'
         self.tf_topic = '/robot' + robot_number + '_tf/base_footprint'
         self.odom_topic = '/robot' + robot_number + '/odom'
+
+        # Creation of laser topic
+        self.laser_topic = '/robot' + robot_number + '/scan'
 
         # Creations of the cameras topics
         self.topic_cam = '/robot' + robot_number + '/camera/rgb/image_raw'
@@ -274,11 +278,8 @@ class Robot:
 
     # callback function to get rgb image
     def read_image(self):
-        print(self.topic_cam)
         data = rospy.wait_for_message(self.topic_cam, Image)
-        print(data)
         self.image = self.bridge.imgmsg_to_cv2(data, desired_encoding='bgr8')
-        print(self.image)
         return self.image
 
 
@@ -291,10 +292,10 @@ class Robot:
 
     # function that extracts the pixels where the obstacle may be
     # and determines wether to turn left, right or not avoiding  
-    def analyze_img(self, img):
+    def analyze_img(self, image):
 
         # convert into hsv colorspace
-        img = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
+        img = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
         # color image thresholds
         high_threshold = np.array([50, 50, 55],  np.uint8)
@@ -329,3 +330,47 @@ class Robot:
             return True, side
         else:
             return False, None
+
+    
+    def detect_obstacles(self):
+
+        data = rospy.wait_for_message(self.laser_topic, LaserScan)
+
+        max_laser_measures = len(data.range)
+
+        mid_range = max_laser_measures/2
+        min_range = mid_range - 2*(max_laser_measures/9)
+        max_range = mid_range + 2*(max_laser_measures/9)
+
+        measures = []
+        cont = min_range
+        while cont < max_range:
+            if np.isnan(data.range[cont]):
+                measures.append(1.2)
+            else:
+                measures.append(data.range[cont])
+            cont += 1
+
+        divisions = 4
+        measures_per_division = (max_range-min_range)/4
+
+        means = []
+
+        cont = 0
+        while cont < max_range:
+            cont2 = cont*measures_per_division
+            sum = 0
+            while cont2 < (cont+1)*measures_per_division and cont2 < max_range:
+                sum += measures[cont2]
+                cont2 += 1
+            means.append(sum/measures_per_division)
+            cont += 1
+
+        if means[0] < 1 or means[1] < 1:
+            return True, 1
+
+        if means[2] < 1 or means[3] < 1:
+            return True, -1
+
+        return False, None
+
