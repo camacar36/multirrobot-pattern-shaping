@@ -6,7 +6,6 @@ import sys
 import tf
 import math
 
-
 def main():
 
     if len(sys.argv) != 2:
@@ -20,7 +19,7 @@ def main():
     robot1 = Robot(robot_number)
 
     # Final point to reach
-    point = [-1,-math.sqrt(3)]
+    point = [2,0]
 
     # Settimg initial position and orientation of the robot
     robot1.get_tf()
@@ -44,6 +43,20 @@ def main():
         robot1.get_tf()
         actual_distance = robot1.get_distance_to_objective(point)
         robot1.move_forward(0.4)
+
+        detected, side = robot1.detect_obstacles()
+        if detected:
+            if side == 1: # Turn left
+                start_angle = robot1.get_actual_orientation()
+                while detected == True:
+                    detected, side = robot1.detect_obstacles()
+                    robot1.turn_left(0.2)
+            
+            elif side == -1: # Turn right
+                start_angle = robot1.get_actual_orientation()
+                while detected == True:
+                    detected, side = robot1.detect_obstacles()
+                    robot1.turn_right(0.2)
 
         # If the previous distance is lower than actual distance, it means that the robot have passed near the point
         # but not so close enough to stop (>0.1), so it reorientates robot and keeps moving
