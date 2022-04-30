@@ -2,21 +2,39 @@
 
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import Image
+from sensor_msgs.msg import LaserScan
+from cv_bridge import CvBridge
+
+import numpy as np
 
 import geometry_msgs.msg
 import rospy
 import math
 import tf
+import cv2
+import time
 
 class Robot:
 
     # Initialization of the node, setting of the velocities and suscription to the velocity node
     def __init__(self, robot_number = '1'):
 
-        # Creation of the robot velocity topic name
+        # Creation of the robot velocity, odometry and trasnformations topic name
         vel_topic = '/robot' + robot_number + '/mobile_base/commands/velocity'
         self.tf_topic = '/robot' + robot_number + '_tf/base_footprint'
         self.odom_topic = '/robot' + robot_number + '/odom'
+
+        # Creation of laser topic
+        self.laser_topic = '/robot' + robot_number + '/scan'
+
+        # Creations of the cameras topics
+        self.topic_cam = '/robot' + robot_number + '/camera/rgb/image_raw'
+        self.topic_depth_cam = '/robot' + robot_number + '/camera/depth/image_raw'
+
+        # Creation of empty images
+        self.image = np.zeros((480, 640, 3), np.uint8)
+        self.depth_image = np.zeros((480, 640, 1), np.uint8)
 
         # Initialization of the node
         robot_name = 'robot' + robot_number
@@ -26,7 +44,7 @@ class Robot:
         self.Listener = tf.TransformListener()  
         m = geometry_msgs.msg.TransformStamped()
         m.header.frame_id = '/map'
-        m.child_frame_id = robot_name + '/base_footprint'
+        m.child_frame_id = '/' + robot_name + '_tf/base_footprint'
         self.Listener.setTransform(m)
 
         # Initialization of initial pose
@@ -50,6 +68,8 @@ class Robot:
         #self.rate = rospy.Rate(5)
         self.rate = rospy.Rate(1)
 
+        self.bridge = CvBridge()
+
 
     # Return actual position
     def get_actual_position(self):
@@ -64,6 +84,16 @@ class Robot:
     # Return variable for debugging
     def get_reached(self):
         return self.reached
+
+    
+    # Returns image
+    def get_image(self):
+        return self.image
+
+
+    # Returns depth image
+    def get_depth_image(self):
+        return self.depth_image
 
 
     # Set variable for debugging
@@ -246,6 +276,103 @@ class Robot:
             #     self.face_to_point(point, 0.5)
 
 
+    # callback function to get rgb image
+    def read_image(self):
+        data = rospy.wait_for_message(self.topic_cam, Image)
+        self.image = self.bridge.imgmsg_to_cv2(data, desired_encoding='bgr8')
+        return self.image
+
+
+    # callback function to get depth image
+    def read_depth_image(self):
+        data = rospy.wait_for_message(self.topic_depth_cam, Image)
+        self.depth_image = self.bridge.imgmsg_to_cv2(data, desired_encoding='32FC1')
+        return self.depth_image
+
+
+    # function that extracts the pixels where the obstacle may be
+    # and determines wether to turn left, right or not avoiding  
+    def analyze_img(self, image):
+
+        # convert into hsv colorspace
+        img = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+        # color image thresholds
+        high_threshold = np.array([50, 50, 55],  np.uint8)
+        low_threshold = np.array([0, 0, 0],  np.uint8)
+
+        # binarize the image parts where the turtlebots are
+        mask = cv2.inRange(img, low_threshold, high_threshold)
+
+        cont = 0
+        left = 0
+        right = 0
+
+        # counting how many pixels are occupied by the turtlebots nearer than 0.6 metres
+        for i in range(480):
+            for j in range(640):
+                if mask[i,j] == 255:
+                    if self.depth_image[i,j] < 0.6 and not np.isnan(self.depth_image[i,j]):
+                        cont = cont + 1
+
+                        # if the majority is on the left or on the right side
+                        if j < 320:
+                            left = left + 1
+                        else:
+                            right = right + 1
+
+        # if there are more than 10000 pixels it can be considered to need avoidance
+        if cont > 10000:
+            if left > right:
+                side = -1 # turn right because object is on the left
+            else:
+                side = 1 # turn left because object is on the right
+            return True, side
+        else:
+            return False, None
+
+    
+    def detect_obstacles(self):
+
+        data = rospy.wait_for_message(self.laser_topic, LaserScan)
+
+        max_laser_measures = len(data.ranges)
+
+        mid_range = max_laser_measures/2
+        min_range = int(mid_range - 2*(max_laser_measures/9))
+        max_range = int(mid_range + 2*(max_laser_measures/9))
+
+        measures = []
+        cont = min_range
+        while cont < max_range:
+            if np.isnan(data.ranges[cont]):
+                measures.append(1.2)
+            else:
+                measures.append(data.ranges[cont])
+            cont += 1
+
+        divisions = 4
+        measures_per_division = int((max_range-min_range)/4)
+
+        means = []
+
+        cont = 0
+        while cont < max_range:
+            cont2 = cont*measures_per_division
+            sum = 0
+            while cont2 < (cont+1)*measures_per_division and cont2 < len(measures):
+                sum += measures[cont2]
+                cont2 += 1
+            means.append(sum/measures_per_division)
+            cont += 1
+
+        if means[0] < 1 or means[1] < 1:
+            return True, 1
+
+        if means[2] < 1 or means[3] < 1:
+            return True, -1
+
+        return False, None
 
 
     
