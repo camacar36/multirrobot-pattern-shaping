@@ -336,23 +336,23 @@ class Robot:
 
         data = rospy.wait_for_message(self.laser_topic, LaserScan)
 
-        max_laser_measures = len(data.range)
+        max_laser_measures = len(data.ranges)
 
         mid_range = max_laser_measures/2
-        min_range = mid_range - 2*(max_laser_measures/9)
-        max_range = mid_range + 2*(max_laser_measures/9)
+        min_range = int(mid_range - 5*(max_laser_measures/18))
+        max_range = int(mid_range + 5*(max_laser_measures/18))
 
         measures = []
         cont = min_range
         while cont < max_range:
-            if np.isnan(data.range[cont]):
-                measures.append(1.2)
+            if np.isnan(data.ranges[cont]):
+                measures.append(1.1)
             else:
-                measures.append(data.range[cont])
+                measures.append(data.ranges[cont])
             cont += 1
 
         divisions = 4
-        measures_per_division = (max_range-min_range)/4
+        measures_per_division = int((max_range-min_range)/10)
 
         means = []
 
@@ -360,17 +360,18 @@ class Robot:
         while cont < max_range:
             cont2 = cont*measures_per_division
             sum = 0
-            while cont2 < (cont+1)*measures_per_division and cont2 < max_range:
+            while cont2 < (cont+1)*measures_per_division and cont2 < len(measures):
                 sum += measures[cont2]
                 cont2 += 1
             means.append(sum/measures_per_division)
             cont += 1
 
-        if means[0] < 1 or means[1] < 1:
+        if means[0] < 1 or means[1] < 1 or means[2] < 1 or means[3] < 1 or means[4] < 1:
             return True, 1
 
-        if means[2] < 1 or means[3] < 1:
+        if means[6] < 1 or means[7] < 1 or means[8] < 1 or means[9] < 1 or means[10] < 1:
             return True, -1
 
         return False, None
+
 
