@@ -22,8 +22,11 @@ def main():
     while not rospy.is_shutdown():
 
         data = rospy.wait_for_message('/goal_points', Polygon)
+        data2 = rospy.wait_for_message('/final_goal_points', UInt16MultiArray)
 
-        point = [data.points[int(robot_number)-1].x, data.points[int(robot_number)-1].y]
+        index = data2.index(int(robot_number))
+
+        point = [data.points[index].x, data.points[index].y]
 
         # Settimg initial position and orientation of the robot
         robot1.get_tf()
