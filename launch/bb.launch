@@ -1,0 +1,3 @@
+<launch>
+	<node name="bb_alg" pkg="multirrobot-pattern-shaping" type="bb" output="screen"/>
+</launch>

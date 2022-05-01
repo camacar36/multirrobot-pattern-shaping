@@ -7,7 +7,8 @@
 <node name="gazebo" pkg="gazebo_ros" type="gazebo" args="$(find turtlebot_gazebo)/worlds/empty.world" respawn="false" output="screen" />
 
 <!-- include our robots -->
-<include file="$(find turtlebot_gazebo)/multirrobot-pattern-shaping/launch/robots.launch"/>
+<include file="$(find multirrobot-pattern-shaping)/launch/robots.launch"/>
+<include file="$(find multirrobot-pattern-shaping)/launch/bb.launch"/>
 
  
 </launch>

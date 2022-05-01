@@ -4,9 +4,8 @@ import time
 import rospy
 
 class Node():
-    cont = 0
-    best_v = math.inf
-    best_sol = []
+   
+    
     m = []
     m_opt = []
 
@@ -17,13 +16,10 @@ class Node():
         self.current_weight = current_weight
         self.path = path
         
-        start = time.time()
+        
         self.pessimistic = self.current_weight + self.greedy()
         self.optimistic = self.current_weight + Node.m_opt[self.p]  #self.opt_greedy()
-        end = time.time()
-        Node.cont = Node.cont + end - start
         self.sol = sol
-        # print(len(Node.m_opt))
 
 
 

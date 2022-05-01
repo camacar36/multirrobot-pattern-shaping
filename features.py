@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import pygame
 
+# our_font = pygame.font.Font(None,20)
+
 class Point: 
     def __init__(self, x, y):
         self.x = x

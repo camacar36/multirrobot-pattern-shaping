@@ -34,8 +34,10 @@ config_icon     = config_loc + "shapingpattern_icon.png"
 config_title    = config_loc + "title.png"
 config_pt_rbt   = config_loc + "points_and_robots.png"
 config_info     = config_loc + "info.png"
+config_axes     = config_loc + "coordinate_system.png"
 
 white           = [255,255,255]
+light_white     = [200,200,200]
 superlightgrey  = [50,50,50]
 lightgrey       = [30,25,25]
 grey            = [18,18,18]
@@ -45,4 +47,12 @@ lightblue       = [100,100,255]
 super_grid      = []
 path            = []
 sol             = []
+
+dic             = {}
+
+info_text       = ["Información de uso:", 
+                    "Pulse click izquierdo para dibujar",  
+                    "Pulse click derecho para borrar", 
+                    "Pulse dibujar para generar los puntos representativos del dibujo", 
+                    "Pulse enviar para que los turtlebots comiencen a moverse"]
 
