@@ -7,6 +7,7 @@
 
     <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
 
+
     <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
         <param name="scan_height" value="10"/>
         <param name="output_frame_id" value="$(arg robot_name)/camera_depth_frame"/>
@@ -15,7 +16,7 @@
         <remap from="scan" to="scan"/>
     </node>
 
-    <node pkg="turtlebot_gazebo" name="move_tb" type="move_tb.py" args="-robot $(arg robot_number) $(arg init_pose)" output="screen" />
+    <node pkg="multirrobot-pattern-shaping" name="move_robot$(arg robot_number)" type="main.py" args="$(arg robot_number)"/>
 
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" >
