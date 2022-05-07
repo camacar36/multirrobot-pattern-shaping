@@ -39,13 +39,9 @@ class Robot:
         # Initialization of the node
         robot_name = 'move_robot' + robot_number
         rospy.init_node(robot_name)
-
+        
         # Creation of listener
         self.Listener = tf.TransformListener()  
-        m = geometry_msgs.msg.TransformStamped()
-        m.header.frame_id = '/map'
-        m.child_frame_id = '/' + robot_name + '_tf/base_footprint'
-        self.Listener.setTransform(m)
 
         # Initialization of initial pose
         trans = None
@@ -57,7 +53,7 @@ class Robot:
         self.init_pos = [trans[0], trans[1]]
         self.actual_pos = [trans[0], trans[1]]
         self.actual_orientation = 0
-
+        
         # THIS IS JUST FOR DEBUGGING
         self.reached = False  
 
