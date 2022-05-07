@@ -1,0 +1,19 @@
+<launch>
+    <param name="/use_sim_time" value="true" />
+
+
+    <!-- start world -->
+    <node name="gazebo" pkg="gazebo_ros" type="gazebo" args="$(find turtlebot_gazebo)/worlds/empty.world" respawn="false" output="screen" />
+
+    <!-- starting the interface -->
+    <node name="interface" pkg="multirrobot-pattern-shaping" type="interfaz.py"/>
+
+    <!-- include our robots and the program to move them-->
+    <include file="$(find multirrobot-pattern-shaping)/launch/robots.launch">
+        <arg name="is_centralized" value="true" />
+    </include>
+
+    <!-- launching the branch & bound algorithm node-->
+    <node name="bb_alg" pkg="multirrobot-pattern-shaping" type="bb" output="screen"/>
+
+</launch>

@@ -1,12 +1,18 @@
 <launch>
     <arg name="robot_name"/>
-    <arg name="init_pose"/>
-    <arg name="robot_number"/>
+    <arg name="pose_x"/>
+    <arg name="pose_y"/>
+    <arg name="pose_z"/>
+    <arg name="pose_R"/>
+    <arg name="pose_P"/>
+    <arg name="pose_Y"/>
 
-    <node name="spawn_minibot_model" pkg="gazebo_ros" type="spawn_model" args="$(arg init_pose) -urdf -param /robot_description -model $(arg robot_name)" respawn="false" output="screen" />
+    <node name="spawn_minibot_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-x $(arg pose_x) -y $(arg pose_y) -z $(arg pose_z) -R $(arg pose_R) -P $(arg pose_P) -Y $(arg pose_Y) -urdf -param /robot_description -model $(arg robot_name)" />
+
+    <node pkg="tf" type="static_transform_publisher" name="robot1_broadcaster" args="$(arg pose_x) $(arg pose_y) $(arg pose_z) $(arg pose_Y) $(arg pose_P) $(arg pose_R) map $(arg robot_name)/odom 100" />
 
     <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
-
 
     <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
         <param name="scan_height" value="10"/>
@@ -16,12 +22,10 @@
         <remap from="scan" to="scan"/>
     </node>
 
-    <node pkg="multirrobot-pattern-shaping" name="move_robot$(arg robot_number)" type="main.py" args="$(arg robot_number)"/>
-
-
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" >
         <param name="publish_frecuency" type="double" value="30.0"/>
         <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
         <!--remap from="/joint_states" to="/$(arg robot_name)/joint_states" /-->
     </node>
+    
 </launch>
